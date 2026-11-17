@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TenderScan – przetargi ATV/UTV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f5f2;--panel:#fff;--ink:#16181d;--mute:#6b6f78;--line:#e4e2dc;--acc:#c8451b;--acc2:#1d5e8c;
+--ok:#1f7a4d;--okbg:#e5f3ea;--warn:#a86500;--warnbg:#fbf0dc;--bad:#b3261e;--badbg:#fbe7e5;--chip:#efede8}
+@media (prefers-color-scheme:dark){:root{--bg:#121316;--panel:#1b1d21;--ink:#ecebe7;--mute:#9a9da5;--line:#2c2f35;
+--chip:#26292e;--okbg:#173326;--warnbg:#3a2c12;--badbg:#3c1a18}}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:22px 28px 0;display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;justify-content:space-between}
+h1{margin:0;font-size:22px;letter-spacing:-.02em}h1 span{color:var(--acc)}
+.sub{color:var(--mute);font-size:13px;margin-top:4px}
+.badge{font:600 11px/1 JetBrains Mono,monospace;padding:5px 8px;border-radius:4px;background:var(--chip);color:var(--mute)}
+nav{display:flex;gap:2px;padding:16px 28px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+nav button{border:0;background:none;color:var(--mute);font:500 14px Inter;padding:10px 14px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--ink);border-color:var(--acc)}
+nav button .n{font:600 11px JetBrains Mono;margin-left:6px;color:var(--mute)}
+main{padding:20px 28px 60px;max-width:1500px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi b{display:block;font-size:26px;letter-spacing:-.02em}.kpi small{color:var(--mute)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.bar input,.bar select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.bar input{min-width:260px}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th{text-align:left;font:600 11px Inter;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);padding:10px 12px;border-bottom:1px solid var(--line);background:var(--chip)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.row{cursor:pointer}tr.row:hover td{background:color-mix(in srgb,var(--acc) 5%,transparent)}
+.t{font-weight:600}.m{color:var(--mute);font-size:12px}
+.v{display:inline-block;font:600 11px JetBrains Mono;padding:3px 7px;border-radius:4px;white-space:nowrap}
+.v.ok{background:var(--okbg);color:var(--ok)}.v.warn{background:var(--warnbg);color:var(--warn)}.v.bad{background:var(--badbg);color:var(--bad)}.v.n{background:var(--chip);color:var(--mute)}
+.typ{font:600 11px JetBrains Mono;color:var(--acc2)}
+.num{font-family:JetBrains Mono;text-align:right;white-space:nowrap}
+.drawer{position:fixed;inset:0 0 0 auto;width:min(860px,100%);background:var(--panel);border-left:1px solid var(--line);box-shadow:-20px 0 40px rgba(0,0,0,.15);transform:translateX(100%);transition:.25s;overflow:auto;z-index:10}
+.drawer.on{transform:none}.drawer .in{padding:24px 28px}
+.x{position:sticky;top:0;float:right;border:0;background:var(--chip);color:var(--ink);border-radius:6px;padding:6px 10px;cursor:pointer}
+.grid2{display:grid;grid-template-columns:140px 1fr;gap:6px 14px;margin:14px 0 20px;font-size:13px}.grid2 div:nth-child(odd){color:var(--mute)}
+.cmp td,.cmp th{font-size:12px;padding:7px 9px}
+.cmp td.s-ok{color:var(--ok)}.cmp td.s-fail{color:var(--bad);font-weight:600}.cmp td.s-unknown{color:var(--mute)}
+h2{font-size:15px;margin:22px 0 10px}h3{font-size:13px;margin:16px 0 8px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+a{color:var(--acc2)}.desc{background:var(--chip);border-radius:8px;padding:12px;font-size:13px;white-space:pre-wrap}
+.note{border-left:3px solid var(--acc);background:var(--panel);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:18px;font-size:13px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.hbar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}.hbar i{display:block;height:8px;background:var(--acc);border-radius:4px}
+.hbar span:first-child{width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin:8px 0 18px}.flow div{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12px}
+.flow b{display:block;font-size:13px;margin-bottom:4px}
+.scanbox{display:flex;gap:8px;align-items:center}.scanbox select{font:inherit;padding:7px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.btn{font:600 13px Inter;padding:8px 14px;border-radius:8px;border:0;background:var(--acc);color:#fff;cursor:pointer}.btn:disabled{opacity:.5;cursor:default}
+.btn.sec{background:var(--chip);color:var(--ink)}
+textarea{width:100%;font:12px/1.4 JetBrains Mono,monospace;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--panel);color:var(--ink)}
+.log{font:12px/1.5 JetBrains Mono,monospace;background:var(--chip);border-radius:8px;padding:12px;white-space:pre-wrap;max-height:420px;overflow:auto}
+.star{color:var(--acc);font-weight:700}
+.empty{padding:30px;text-align:center;color:var(--mute)}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Tender<span>Scan</span> · przetargi ATV/UTV</h1>
+  <div class="sub" id="sub"></div></div>
+  <div class="scanbox"><span id="st" class="badge">…</span>
+  <select id="days"><option value="2">2 dni</option><option value="7">7 dni</option><option value="30">30 dni</option><option value="60">60 dni</option></select>
+  <button class="btn" id="scanbtn" onclick="scanNow()">Skanuj teraz</button></div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<aside class="drawer" id="drawer"><div class="in" id="dr"></div></aside>
+<script>
+let DATA={tenders:[],catalog:[],status:{}},T=[],CAT=[];
+async function load(){try{const r=await fetch('api/data');DATA=await r.json();T=DATA.tenders;CAT=DATA.catalog;
+ document.getElementById('sub').textContent=`Odświeżono ${DATA.generated} · ${T.length} pozycji · ostatni udany skan: ${(DATA.status.last_ok||'jeszcze nie było').replace('T',' ')} · skan co ${DATA.status.interval_h} h`;
+ stat(DATA.status);render()}catch(e){document.getElementById('sub').textContent='Błąd ładowania danych: '+e}}
+function stat(s){const el=document.getElementById('st'),b=document.getElementById('scanbtn');
+ el.textContent=s.running?('SKANUJĘ: '+s.current):('GOTOWY'+(s.next_run?' · następny '+s.next_run.replace('T',' '):''));b.disabled=!!s.running}
+async function scanNow(){const d=document.getElementById('days').value;const r=await fetch('api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({days:+d})});
+ if(r.status===409)return;poll()}
+let pollT=null;async function poll(){clearTimeout(pollT);const s=await (await fetch('api/status')).json();stat(s);
+ if(tab==='skany')document.getElementById('main').innerHTML=skany(s);
+ if(s.running)pollT=setTimeout(poll,4000);else load()}
+const fmt=n=>n==null||n===''?'–':Number(n).toLocaleString('pl-PL',{maximumFractionDigits:0});
+const pln=n=>n==null||n===''||n===0?'–':fmt(n)+' zł';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const verd=t=>{const m=(t.matches||[])[0];if(!m)return'<span class="v n">brak danych</span>';
+ const c=m.verdict==='SPEŁNIA'?'ok':m.verdict==='BLISKO'?'warn':'bad';return`<span class="v ${c}">${m.verdict} · ${m.score}%</span>`};
+const TABS=[
+ ['przeglad','Przegląd',()=>T.length],
+ ['obserwowane','Obserwowane',()=>T.filter(t=>t.watch).length],
+ ['open','Nowe przetargi',()=>T.filter(t=>t.kind==='open').length],
+ ['offers','Otwarcie ofert',()=>T.filter(t=>t.kind==='offers').length],
+ ['result','Rozstrzygnięte',()=>T.filter(t=>t.kind==='result').length],
+ ['cancelled','Unieważnione',()=>T.filter(t=>t.kind==='cancelled').length],
+ ['plan','Plany zamówień',()=>T.filter(t=>t.kind==='plan').length],
+ ['konkurencja','Konkurencja',()=>''],
+ ['katalog','Nasz katalog',()=>CAT.length],
+ ['skany','Skany i log',()=>''],
+ ['zrodla','Jak to działa',()=>''],
+];
+let tab=(location.hash||'#przeglad').slice(1);if(!TABS.find(x=>x[0]===tab))tab='przeglad';
+let F={q:'',type:'',prov:'',verd:''};
+function nav(){document.getElementById('nav').innerHTML=TABS.map(([k,l,n])=>`<button class="${k===tab?'on':''}" onclick="go('${k}')">${l}<span class="n">${n()}</span></button>`).join('')}
+function go(k){tab=k;location.hash=k;render()}
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h&&h!==tab&&TABS.find(x=>x[0]===h)){tab=h;render()}});
+function filt(list){return list.filter(t=>{
+ const s=(t.title+' '+t.buyer+' '+t.city+' '+t.id).toLowerCase();
+ if(F.q&&!s.includes(F.q.toLowerCase()))return false;
+ if(F.type&&t.vehicle_type!==F.type)return false;
+ if(F.prov&&t.province!==F.prov)return false;
+ if(F.verd&&((t.matches||[])[0]||{}).verdict!==F.verd)return false;return true})}
+function bar(){const provs=[...new Set(T.map(t=>t.province).filter(Boolean))].sort();
+ return`<div class="bar"><input placeholder="Szukaj: zamawiający, przedmiot, nr BZP…" value="${esc(F.q)}" oninput="F.q=this.value;renderBody()">
+ <select onchange="F.type=this.value;renderBody()"><option value="">Typ: wszystkie</option>${['ATV','UTV','Łączone'].map(x=>`<option ${F.type===x?'selected':''}>${x}</option>`).join('')}</select>
+ <select onchange="F.prov=this.value;renderBody()"><option value="">Województwo: wszystkie</option>${provs.map(x=>`<option ${F.prov===x?'selected':''}>${x}</option>`).join('')}</select>
+ <select onchange="F.verd=this.value;renderBody()"><option value="">Dopasowanie: wszystkie</option>${['SPEŁNIA','BLISKO','NIE SPEŁNIA'].map(x=>`<option ${F.verd===x?'selected':''}>${x}</option>`).join('')}</select></div><div id="body"></div>`}
+function table(list,kind){
+ if(!list.length)return'<div class="empty">Brak pozycji dla wybranych filtrów.</div>';
+ const head={open:['Termin','Zamawiający / przedmiot','Typ','Ilość','Najlepszy nasz model','Dopasowanie'],
+  offers:['Otwarcie','Zamawiający / przedmiot','Typ','Budżet','Najniższa oferta','Dopasowanie'],
+  result:['Złożenie','Zamawiający / przedmiot','Typ','Zwycięzca','Wartość','Dopasowanie'],
+  cancelled:['Złożenie','Zamawiający / przedmiot','Typ','Budżet','Przyczyna','Dopasowanie'],
+  plan:['Publikacja','Zamawiający / opis pozycji planu','Typ','Budżet','Kwartał','Info']}[kind];
+ return`<table><tr>${head.map((h,i)=>`<th class="${[3,4].includes(i)&&kind!=='open'&&kind!=='plan'?'':''}">${h}</th>`).join('')}</tr>${list.map(t=>{
+  const i=T.indexOf(t);const lead=`<td><div class="t">${t.watch?'<span class="star">★ </span>':''}${esc(t.buyer)}</div><div class="m">${esc(t.city)} · ${esc(t.province)} · ${esc(t.id)}</div><div>${esc(t.title)}</div></td><td class="typ">${esc(t.vehicle_type)}</td>`;
+  const best=(t.matches||[])[0];
+  let cells={open:`<td class="num">${esc(t.deadline||'')}${t.deadline&&t.deadline<new Date().toISOString().slice(0,16).replace('T',' ')?'<div class="m">po terminie – czeka na wynik</div>':''}<div class="m">${esc(t.source)}</div></td>${lead}<td class="num">${fmt(t.qty)}</td><td>${best?esc(best.brand+' '+best.model):'–'}</td><td>${verd(t)}</td>`,
+   offers:`<td class="num">${esc((t.deadline||'').slice(0,10))}</td>${lead}<td class="num">${pln(t.budget)}</td><td>${minOffer(t)}</td><td>${verd(t)}</td>`,
+   result:`<td class="num">${esc((t.deadline||'').slice(0,10))}</td>${lead}<td>${esc((t.winners||[]).join(', ')||'–')}</td><td class="num">${pln(t.value)}</td><td>${verd(t)}</td>`,
+   cancelled:`<td class="num">${esc((t.deadline||'').slice(0,10))}</td>${lead}<td class="num">${pln(t.budget)}</td><td>${esc(t.cancel_reason||t.status||'')}</td><td>${verd(t)}</td>`,
+   plan:`<td class="num">${esc((t.published||'').slice(0,10))}</td>${lead}<td class="num">${pln(t.budget)}</td><td>${esc(t.deadline||'')}</td><td>${t.relevance<50?'<span class="v bad">fałszywe trafienie?</span>':'<span class="v n">monitoruj</span>'}</td>`}[kind];
+  return`<tr class="row" onclick="open_(${i})">${cells}</tr>`}).join('')}</table>`}
+function minOffer(t){const o=(t.offers||[]).filter(x=>x.price);if(!o.length)return'–';o.sort((a,b)=>a.price-b.price);return`<div class="num" style="text-align:left">${pln(o[0].price)}</div><div class="m">${esc(o[0].name)}</div>`}
+function renderBody(){const el=document.getElementById('body');if(!el)return;if(tab==='obserwowane'){el.innerHTML=table(filt(T.filter(t=>t.watch)),'open');return}el.innerHTML=table(filt(T.filter(t=>t.kind===tab)),tab)}
+function open_(i){const t=T[i];const ms=t.matches||[];const reqs=(t.reqs&&t.reqs.reqs)||[];
+ const flags=t.reqs&&t.reqs.flags?Object.entries(t.reqs.flags).filter(([k,v])=>v).map(([k])=>k):[];
+ let cmp='';
+ if(ms.length){const rows=ms[0].rows.map((r,ri)=>`<tr><td>${esc(r.label)}</td><td class="num">${r.min!=null?'≥ '+fmt(r.min):''}${r.min!=null&&r.max!=null?' · ':''}${r.max!=null?'≤ '+fmt(r.max):''}${r.min==null&&r.max==null?'wymagane':''}</td>${ms.map(m=>{const x=m.rows[ri];return`<td class="num s-${x.status}">${x.status==='ok'?'✓ ':x.status==='fail'?'✗ ':'? '}${typeof x.value==='boolean'?(x.value?'tak':'nie'):fmt(x.value)}</td>`}).join('')}</tr>`).join('');
+  cmp=`<h2>Wymagania vs nasze modele</h2><table class="cmp"><tr><th>Parametr</th><th>Wymaganie</th>${ms.map(m=>`<th>${esc(m.model)}<br>${m.verdict==='SPEŁNIA'?'<span class="v ok">':m.verdict==='BLISKO'?'<span class="v warn">':'<span class="v bad">'}${m.verdict} ${m.score}%</span>${m.type_ok?'':' <span class="v bad">inny typ</span>'}</th>`).join('')}</tr>${rows}</table>
+  <p class="m">✓ spełnia · ✗ nie spełnia · ? brak danych w katalogu. Wartości katalogu są przykładowe – patrz zakładka „Nasz katalog”.</p>`}
+ else cmp='<h2>Wymagania vs nasze modele</h2><div class="desc">Ogłoszenie / plan nie zawiera parametrów technicznych. Pełne wymagania pojawią się po pobraniu SWZ/OPZ (moduł do rozbudowy).</div>';
+ const offers=(t.offers||[]).filter(o=>o.name);
+ document.getElementById('dr').innerHTML=`<button class="x" onclick="close_()">Zamknij ✕</button>
+ <div class="m">${esc(t.id)} · ${esc(t.source)}</div><h2 style="margin-top:6px;font-size:19px">${esc(t.title)}</h2>
+ <div class="grid2"><div>Zamawiający</div><div>${esc(t.buyer)} (NIP ${esc(t.buyer_nip)})</div><div>Lokalizacja</div><div>${esc(t.city)}, ${esc(t.province)}</div>
+ <div>Typ pojazdu</div><div>${esc(t.vehicle_type)} ${t.qty?'· '+fmt(t.qty)+' szt.':''}${t.option?' (+'+fmt(t.option)+' opcja)':''}</div><div>Status</div><div>${esc(t.status||t.kind)}</div>
+ <div>Termin</div><div>${esc(t.deadline||'–')}</div>${t.budget?`<div>Budżet</div><div>${pln(t.budget)}</div>`:''}${t.value?`<div>Wartość umowy</div><div>${pln(t.value)}</div>`:''}
+ ${t.criteria?`<div>Kryteria (cena/termin/…)</div><div>${esc(t.criteria)}</div>`:''}${t.delivery?`<div>Termin dostawy</div><div>${esc(t.delivery)}</div>`:''}
+ <div>Link</div><div>${t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener">${esc(t.link.replace(/^https?:\/\//,'').slice(0,70))}…</a>`:'–'}</div>
+ <div>Dlaczego trafiło</div><div>${esc((t.why||[]).join(', ')||'–')} (trafność ${t.relevance}%)</div></div>
+ ${t.description?`<h3>Opis wymagań (źródło)</h3><div class="desc">${esc(t.description)}</div>`:''}
+ <h3>Notatka handlowca</h3><textarea id="note" rows="3" placeholder="np. kto prowadzi, ustalenia z zamawiającym…">${esc(t.note||'')}</textarea>
+ <div style="display:flex;gap:8px;margin-top:8px"><button class="btn" onclick="saveNote(${i},true)">${t.watch?'Zapisz':'Obserwuj i zapisz'}</button>${t.watch?`<button class="btn sec" onclick="saveNote(${i},false)">Przestań obserwować</button>`:''}${t.platform_link?`<a class="btn sec" style="text-decoration:none" href="${esc(t.platform_link)}" target="_blank" rel="noopener">Platforma / SWZ ↗</a>`:''}</div>
+ ${cmp}${flags.length?`<p class="m">Wykryte cechy/wyposażenie: ${flags.join(', ')}</p>`:''}
+ ${offers.length?`<h2>Złożone oferty</h2><table class="cmp"><tr><th>Oferent</th><th class="num">Cena</th><th class="num">vs budżet</th></tr>${offers.sort((a,b)=>(a.price||9e9)-(b.price||9e9)).map(o=>`<tr><td>${esc(o.name)}</td><td class="num">${pln(o.price)}</td><td class="num">${t.budget&&o.price?((o.price/t.budget-1)*100).toFixed(1)+'%':'–'}</td></tr>`).join('')}</table>`:''}`;
+ document.getElementById('drawer').classList.add('on')}
+async function saveNote(i,w){const t=T[i];const note=document.getElementById('note').value;
+ await fetch('api/tender/'+encodeURIComponent(t.id)+'/note',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({note,watch:w})});
+ t.note=note;t.watch=w;open_(i);nav()}
+function close_(){document.getElementById('drawer').classList.remove('on')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close_()});
+function przeglad(){
+ const open=T.filter(t=>t.kind==='open'),pl=T.filter(t=>t.kind==='plan'&&t.relevance>=50);
+ const fit=T.filter(t=>['open','offers'].includes(t.kind)&&(t.matches||[])[0]&&['SPEŁNIA','BLISKO'].includes(t.matches[0].verdict));
+ const res=T.filter(t=>t.kind==='result');const val=res.reduce((a,t)=>a+(+t.value||0),0);
+ const byProv={};T.filter(t=>t.kind!=='plan').forEach(t=>byProv[t.province]=(byProv[t.province]||0)+1);
+ const pv=Object.entries(byProv).sort((a,b)=>b[1]-a[1]);const mx=pv[0]?pv[0][1]:1;
+ return`<div class="note">Przetargi pobierane automatycznie z BZP (e-Zamówienia) + historia z plików Projectsystem. <b>Specyfikacje modeli w katalogu są przykładowe</b> – uzupełnij je w zakładce „Nasz katalog”, wtedy dopasowania przeliczą się same.</div>
+ <div class="kpis"><div class="kpi"><small>Otwarte przetargi</small><b>${open.length}</b><small>składanie ofert</small></div>
+ <div class="kpi"><small>Pasują do oferty</small><b>${fit.length}</b><small>SPEŁNIA lub BLISKO (otwarte + w ocenie)</small></div>
+ <div class="kpi"><small>Plany zamówień ATV/UTV</small><b>${pl.length}</b><small>leady na przyszłe kwartały</small></div>
+ <div class="kpi"><small>Rozstrzygnięte</small><b>${res.length}</b><small>${pln(val)} łącznie</small></div></div>
+ <div class="cols"><div class="card"><h3 style="margin-top:0">Do działania teraz – otwarte i pasujące</h3>${open.length?open.map(t=>`<div class="hbar" style="cursor:pointer" onclick="open_(${T.indexOf(t)})"><span>${esc(t.buyer)}</span><span class="typ">${esc(t.vehicle_type)}</span>${verd(t)}<span class="m">${esc(t.deadline||'')}</span></div>`).join(''):'<div class="m">Brak</div>'}</div>
+ <div class="card"><h3 style="margin-top:0">Postępowania wg województw</h3>${pv.map(([p,n])=>`<div class="hbar"><span>${esc(p)}</span><i style="width:${n/mx*160}px"></i><b>${n}</b></div>`).join('')}</div></div>`}
+function konk(){
+ const wins={},offs={};T.forEach(t=>{(t.winners||[]).forEach(w=>{if(!w)return;wins[w]=wins[w]||{n:0,v:0};wins[w].n++;wins[w].v+=(+t.value||0)});
+  (t.offers||[]).forEach(o=>{if(!o.name)return;offs[o.name]=offs[o.name]||{n:0,min:0};offs[o.name].n++;const lo=Math.min(...t.offers.filter(x=>x.price).map(x=>x.price));if(o.price===lo)offs[o.name].min++})});
+ const w=Object.entries(wins).sort((a,b)=>b[1].v-a[1].v),o=Object.entries(offs).sort((a,b)=>b[1].n-a[1].n);
+ return`<div class="cols"><div class="card"><h3 style="margin-top:0">Zwycięzcy (rozstrzygnięte)</h3><table class="cmp"><tr><th>Wykonawca</th><th class="num">Wygrane</th><th class="num">Wartość</th></tr>${w.map(([k,x])=>`<tr><td>${esc(k)}</td><td class="num">${x.n}</td><td class="num">${pln(x.v)}</td></tr>`).join('')}</table></div>
+ <div class="card"><h3 style="margin-top:0">Aktywność oferentów</h3><table class="cmp"><tr><th>Oferent</th><th class="num">Ofert</th><th class="num">Najtańsza</th></tr>${o.map(([k,x])=>`<tr><td>${esc(k)}</td><td class="num">${x.n}</td><td class="num">${x.min}</td></tr>`).join('')}</table></div></div>`}
+function katalog(){const keys=['engine_cc','power_hp','clearance_mm','payload_kg','towing_kg','winch_lbs','length_mm','width_mm','height_mm','wheelbase_mm','dry_weight_kg','fuel_l','seats'];
+ const L={engine_cc:'ccm',power_hp:'KM',clearance_mm:'Prześwit',payload_kg:'Ładown.',towing_kg:'Uciąg',winch_lbs:'Wyciąg. lbs',length_mm:'Dł.',width_mm:'Szer.',height_mm:'Wys.',wheelbase_mm:'Rozst. osi',dry_weight_kg:'Masa',fuel_l:'Zb. L',seats:'Miejsca'};
+ return`<div class="note">Katalog przykładowy (wartości orientacyjne do testów). Docelowo: import z kart technicznych importera, z wersjami, wyposażeniem opcjonalnym i cenami – od tego zależy jakość dopasowania.</div>
+ <details style="margin-bottom:14px"><summary style="cursor:pointer;font-weight:600">Edytuj katalog (JSON) – zapis przelicza dopasowania wszystkich przetargów</summary>
+ <textarea id="catjson" rows="22" style="margin-top:10px">${esc(JSON.stringify({models:CAT},null,2))}</textarea>
+ <div style="display:flex;gap:8px;align-items:center;margin-top:8px"><button class="btn" onclick="saveCat()">Zapisz katalog</button><span id="catmsg" class="m"></span></div></details>
+ <table class="cmp"><tr><th>Model</th><th>Typ</th>${keys.map(k=>`<th class="num">${L[k]}</th>`).join('')}<th>Cechy</th></tr>${CAT.map(m=>`<tr><td><b>${esc(m.brand)}</b> ${esc(m.name)}</td><td class="typ">${m.type}</td>${keys.map(k=>`<td class="num">${fmt(m.spec[k])}</td>`).join('')}<td class="m">${Object.entries(m.spec.flags||{}).filter(([k,v])=>v).map(([k])=>k).join(', ')}</td></tr>`).join('')}</table>`}
+async function saveCat(){const m=document.getElementById('catmsg');let body;try{body=JSON.parse(document.getElementById('catjson').value)}catch(e){m.textContent='Błąd JSON: '+e.message;return}
+ m.textContent='Zapisuję i przeliczam…';const r=await fetch('api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();
+ if(!r.ok){m.textContent='Błąd: '+j.error;return}m.textContent='Zapisano. Przeliczono '+j.rematched+' pozycji.';await load();tab='katalog';render()}
+function skany(s){s=s||DATA.status;return`<div class="cols"><div class="card"><h3 style="margin-top:0">Ostatnie skany BZP</h3><table class="cmp"><tr><th>Start</th><th>Zakres</th><th class="num">Przejrz.</th><th class="num">ATV/UTV</th><th class="num">Nowe</th><th>Błąd</th></tr>${(s.scans||[]).map(x=>`<tr><td>${esc((x.started||'').replace('T',' '))}</td><td>${esc((x.date_from||'').slice(0,10))} → ${esc((x.date_to||'').slice(0,10))}</td><td class="num">${fmt(x.seen)}</td><td class="num">${fmt(x.hits)}</td><td class="num">${fmt(x.new)}</td><td style="color:var(--bad)">${esc(x.error||'')}</td></tr>`).join('')||'<tr><td colspan=6 class="m">Brak skanów</td></tr>'}</table></div>
+ <div class="card"><h3 style="margin-top:0">Ustawienia</h3><div class="grid2" style="margin:0"><div>Interwał</div><div>co ${s.interval_h} h</div><div>Próg trafności</div><div>${s.min_relevance}%</div><div>Następny skan</div><div>${esc((s.next_run||'–').replace('T',' '))}</div><div>Teraz</div><div>${s.running?esc(s.current):'bezczynny'}</div></div></div></div>
+ <div class="card" style="margin-top:16px"><h3 style="margin-top:0">Import historii (Projectsystem → history.json)</h3>
+ <input type="file" id="imp" accept=".json"> <button class="btn sec" onclick="doImport()">Importuj</button> <span id="impmsg" class="m"></span></div>
+ <h2>Log</h2><div class="log">${esc((s.log||[]).slice().reverse().join('\n'))}</div>`}
+async function doImport(){const f=document.getElementById('imp').files[0],m=document.getElementById('impmsg');if(!f){m.textContent='Wybierz plik';return}
+ m.textContent='Importuję…';try{const r=await fetch('api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:await f.text()});const j=await r.json();m.textContent=r.ok?('Zaimportowano '+j.imported):('Błąd: '+j.error);load()}catch(e){m.textContent='Błąd: '+e}}
+function zrodla(){return`<h2>Jak działa obecny Excel (Projectsystem)</h2>
+ <div class="flow"><div><b>Serwer Projectsystem</b>FTP 31.0.213.202/projectsystemnet – pliki licencji (.json) i bazy (.xlsb/.xlsx) przygotowywane przez dostawcę</div>
+ <div><b>Power Query</b>VDT → VTV (JSON z filtrami licencji: województwa, typy, NIP-y, DLN) → api_PS_szablon / api_URL_dane</div>
+ <div><b>Filtrowanie</b>stan postępowania, typ pojazdu, województwo, wykluczone miasta i NIP-y</div>
+ <div><b>Arkusze</b>Zamówienia · Wybrane · Oferty · Rozstrzygnięte · Unieważnione · Realizacje · Plany</div></div>
+ <p>Excel niczego nie skanuje sam – pobiera gotową, ręcznie opracowaną bazę dostawcy. Źródłem pierwotnym są ogłoszenia z BZP/TED i dokumenty na platformach zamawiających.</p>
+ <h2>Jak działa TenderScan</h2>
+ <div class="flow"><div><b>1. Pobieranie</b>API BZP <code>mo-board/api/v1/notice</code> – ogłoszenia o zamówieniu i o wyniku, codziennie</div>
+ <div><b>2. Klasyfikacja</b>ATV/UTV/quad/SSV, L7e/T3b, CPV 34144700 itd.; odrzuca fałszywe trafienia</div>
+ <div><b>3. Wymagania</b>parser: ccm, KM/kW, prześwit, ładowność, wymiary, wyciągarka, 4x4, CVT, homologacja…</div>
+ <div><b>4. Dopasowanie</b>porównanie z katalogiem modeli → SPEŁNIA / BLISKO / NIE SPEŁNIA + lista rozbieżności</div>
+ <div><b>5. Wyniki</b>zwycięzcy i ceny z ogłoszeń o wyniku → analiza konkurencji</div></div>
+ <h3>Źródła wykryte w danych Projectsystem</h3><table class="cmp"><tr><th>Źródło</th><th>Rola</th><th>Dostęp</th></tr>
+ <tr><td>ezamowienia.gov.pl (BZP)</td><td>ogłoszenia, wyniki, plany postępowań</td><td><span class="v ok">publiczne API, bez klucza</span></td></tr>
+ <tr><td>platformazakupowa.pl</td><td>dokumenty (SWZ/OPZ), oferty z otwarcia</td><td><span class="v warn">strona WWW</span></td></tr>
+ <tr><td>*.ezamawiajacy.pl (Marketplanet)</td><td>dokumenty, oferty</td><td><span class="v warn">strona WWW</span></td></tr>
+ <tr><td>logintrade.net, josephine.proebiz.com, platformy gmin (#/offer/)</td><td>dokumenty, oferty</td><td><span class="v warn">strona WWW</span></td></tr>
+ <tr><td>TED (ted.europa.eu)</td><td>przetargi powyżej progów UE (np. 2026/S 193-688826)</td><td><span class="v ok">publiczne API</span></td></tr></table>`}
+function render(){nav();close_();const m=document.getElementById('main');
+ if(tab==='przeglad')m.innerHTML=przeglad();else if(tab==='konkurencja')m.innerHTML=konk();else if(tab==='katalog')m.innerHTML=katalog();
+ else if(tab==='zrodla')m.innerHTML=zrodla();else if(tab==='skany'){m.innerHTML=skany();poll()}else{m.innerHTML=bar();renderBody()}}
+load();setInterval(()=>{if(!document.getElementById('drawer').classList.contains('on'))load()},300000);
+</script>
+</body>
+</html>

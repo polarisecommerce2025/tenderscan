@@ -1,0 +1,61 @@
+{
+  "_info": "KATALOG PRZYKŁADOWY. Wartości orientacyjne, wpisane do testów prototypu – przed użyciem zastąpić danymi z kart technicznych importera (Polaris / TGB / ZXMOTO itd.). Klucze parametrów: engine_cc, power_hp, clearance_mm, payload_kg, towing_kg, winch_lbs, length_mm, width_mm, height_mm, wheelbase_mm, dry_weight_kg, fuel_l, susp_travel_mm, speed_kmh, seats.",
+  "models": [
+    {
+      "name": "Sportsman 570 EPS", "brand": "Polaris", "type": "ATV",
+      "spec": {"engine_cc": 567, "power_hp": 44, "clearance_mm": 279, "towing_kg": 567,
+               "length_mm": 2108, "width_mm": 1220, "height_mm": 1222, "wheelbase_mm": 1295,
+               "dry_weight_kg": 323, "fuel_l": 17, "seats": 1, "winch_lbs": 2500,
+               "flags": {"4x4": true, "cvt": true, "t3b": true, "l7e": false, "eps": true, "diff_lock": false, "6x6": false}}
+    },
+    {
+      "name": "Sportsman Touring 570 EPS", "brand": "Polaris", "type": "ATV",
+      "spec": {"engine_cc": 567, "power_hp": 44, "clearance_mm": 279, "towing_kg": 567,
+               "length_mm": 2385, "width_mm": 1220, "height_mm": 1250, "wheelbase_mm": 1500,
+               "dry_weight_kg": 352, "fuel_l": 17, "seats": 2, "winch_lbs": 2500,
+               "flags": {"4x4": true, "cvt": true, "t3b": true, "l7e": false, "eps": true, "diff_lock": false, "6x6": false}}
+    },
+    {
+      "name": "Sportsman XP 1000", "brand": "Polaris", "type": "ATV",
+      "spec": {"engine_cc": 952, "power_hp": 90, "clearance_mm": 292, "towing_kg": 680,
+               "length_mm": 2210, "width_mm": 1220, "height_mm": 1250, "wheelbase_mm": 1475,
+               "dry_weight_kg": 381, "fuel_l": 20, "seats": 1, "winch_lbs": 3500, "susp_travel_mm": 254,
+               "flags": {"4x4": true, "cvt": true, "t3b": true, "l7e": false, "eps": true, "diff_lock": false, "6x6": false}}
+    },
+    {
+      "name": "Sportsman Touring XP 1000", "brand": "Polaris", "type": "ATV",
+      "spec": {"engine_cc": 952, "power_hp": 90, "clearance_mm": 292, "towing_kg": 680,
+               "length_mm": 2450, "width_mm": 1220, "height_mm": 1290, "wheelbase_mm": 1475,
+               "dry_weight_kg": 415, "fuel_l": 20, "seats": 2, "winch_lbs": 3500, "susp_travel_mm": 254,
+               "flags": {"4x4": true, "cvt": true, "t3b": true, "l7e": false, "eps": true, "diff_lock": false, "6x6": false}}
+    },
+    {
+      "name": "Sportsman 6x6 570", "brand": "Polaris", "type": "ATV",
+      "spec": {"engine_cc": 567, "power_hp": 44, "clearance_mm": 279, "towing_kg": 680,
+               "length_mm": 3000, "width_mm": 1219, "height_mm": 1270, "wheelbase_mm": 1955,
+               "dry_weight_kg": 520, "fuel_l": 20, "seats": 1, "payload_kg": 363, "winch_lbs": 3500,
+               "flags": {"4x4": true, "6x6": true, "cvt": true, "t3b": true, "l7e": false, "eps": true, "diff_lock": true}}
+    },
+    {
+      "name": "Ranger 570 Full-Size", "brand": "Polaris", "type": "UTV",
+      "spec": {"engine_cc": 567, "power_hp": 44, "clearance_mm": 305, "payload_kg": 454, "towing_kg": 680,
+               "length_mm": 2896, "width_mm": 1575, "height_mm": 1930, "wheelbase_mm": 1930,
+               "dry_weight_kg": 600, "fuel_l": 36, "seats": 3, "winch_lbs": 4500,
+               "flags": {"4x4": true, "cvt": true, "t3b": true, "l7e": false, "eps": true, "diff_lock": false, "6x6": false, "cab": false}}
+    },
+    {
+      "name": "Ranger XP 1000", "brand": "Polaris", "type": "UTV",
+      "spec": {"engine_cc": 999, "power_hp": 82, "clearance_mm": 330, "payload_kg": 680, "towing_kg": 1134,
+               "length_mm": 3048, "width_mm": 1575, "height_mm": 1956, "wheelbase_mm": 2057,
+               "dry_weight_kg": 750, "fuel_l": 43, "seats": 3, "winch_lbs": 4500, "speed_kmh": 60,
+               "flags": {"4x4": true, "cvt": true, "t3b": true, "l7e": false, "eps": true, "diff_lock": true, "6x6": false, "cab": false}}
+    },
+    {
+      "name": "Ranger Crew XP 1000", "brand": "Polaris", "type": "UTV",
+      "spec": {"engine_cc": 999, "power_hp": 82, "clearance_mm": 330, "payload_kg": 680, "towing_kg": 1134,
+               "length_mm": 3962, "width_mm": 1575, "height_mm": 1990, "wheelbase_mm": 2972,
+               "dry_weight_kg": 870, "fuel_l": 43, "seats": 6, "winch_lbs": 4500, "speed_kmh": 60,
+               "flags": {"4x4": true, "cvt": true, "t3b": true, "l7e": false, "eps": true, "diff_lock": true, "6x6": false, "cab": false}}
+    }
+  ]
+}
