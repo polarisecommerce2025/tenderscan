@@ -200,7 +200,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path in ("/", "/index.html"):
             return self._send(200, (APP_DIR / "web" / "index.html").read_bytes(), "text/html; charset=utf-8")
-        if self.path in ("/logo-color.svg", "/logo-white.svg"):  # logo publiczne – także dla ekranu logowania
+        if self.path in ("/logo-color.svg", "/logo-white.svg"):  # logo Polonia Cup (za logowaniem, jak cały panel)
             return self._send(200, (APP_DIR / "web" / self.path[1:]).read_bytes(), "image/svg+xml")
         if self.path == "/api/data":
             return self._send(200, {"generated": datetime.now().strftime("%Y-%m-%d %H:%M"),
