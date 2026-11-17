@@ -43,7 +43,7 @@ API BZP ──► bzp_client.py ──► classify.py ──► spec_parser.py �
 (bez dodatkowych bibliotek – sama biblioteka standardowa Pythona). Dane (SQLite, katalog modeli) leżą w wolumenie `tenderscan_data`.
 
 ```bash
-TS_PASS='silne-haslo' docker compose up -d     # panel: http://<serwer>:8765  (login: admin)
+TS_PASS='silne-haslo' docker compose up -d     # panel: http://<serwer>:18765  (login: admin)
 ```
 Aktualizacja: `git push` do `main`, potem restart kontenera.
 
