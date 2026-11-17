@@ -6,18 +6,17 @@ import re
 
 # --- słowa kluczowe -------------------------------------------------------
 ATV_RX = re.compile(
-    r"(?<![A-Za-z])ATV(?![A-Za-z])|\bquad(?:a|y|em|ów|ami)?\b|czterokołow|\bL7e\b|pojazd\w* typu quad", re.I)
+    r"(?<![A-Za-z])ATV(?![A-Za-z])|\bquad(?:a|y|em|ów|ami)?\b|czterokołowiec|pojazd\w* czterokołow\w*|\bL7e\b", re.I)
 UTV_RX = re.compile(
     r"(?<![A-Za-z])UTV(?![A-Za-z])|\bSSV\b|side[\s-]?by[\s-]?side|\bRTV\b|pojazd\w* (?:typu )?ewakuacyjn\w* typu UTV", re.I)
 GENERIC_RX = re.compile(
-    r"pojazd\w* (?:typu )?(?:terenow|wielozadaniow|użytkow|gąsienicow|ratownicz)\w*"
-    r"|T3b|ciągnik\w* rolnicz\w* (?:typu|kategorii) T3", re.I)
+    r"pojazd\w* (?:typu )?(?:terenow|wielozadaniow|gąsienicow)\w*"
+    r"|\bT3b\b|ciągnik\w* rolnicz\w* (?:typu|kategorii) T3", re.I)
 EXCLUDE_RX = re.compile(
     r"quad[\s-]?core|czterordzeniow|quadro|quadrat|kwadrat|ATV-?\d{3}\b", re.I)
 
 # CPV traktowane jako sygnał pomocniczy (same nie wystarczą)
-CPV_HINTS = ("34144700", "34144000", "34144900", "34100000", "34114000",
-             "34113000", "34110000", "34131000", "34142000", "34400000")
+CPV_HINTS = ("34113300", "34144700", "34144900", "16700000")   # terenowe, użytkowe, elektryczne, ciągniki
 
 
 def html_to_text(body: str | None) -> str:
@@ -44,11 +43,14 @@ def classify(order_object: str, cpv: str, text: str) -> dict:
         score = 100; why.append("ATV/UTV w nazwie zamówienia")
     elif atv_b or utv_b:
         score = 70; why.append("ATV/UTV w treści ogłoszenia")
-    if GENERIC_RX.search(clean_oo) or GENERIC_RX.search(clean_tx):
-        score = max(score, 35); why.append("pojazd terenowy/wielozadaniowy")
-    if any(c in (cpv or "") for c in CPV_HINTS):
-        score = min(100, score + 15) if score else 20
-        why.append("CPV pojazdowy")
+    generic = bool(GENERIC_RX.search(clean_oo) or GENERIC_RX.search(clean_tx))
+    cpv_hit = any(c in (cpv or "") for c in CPV_HINTS)
+    if generic:
+        why.append("pojazd terenowy/wielozadaniowy")
+        score = max(score, 50 if cpv_hit else 30)
+    if cpv_hit:
+        why.append("CPV pojazd terenowy/użytkowy")
+        score = max(score, 20)
 
     atv, utv = atv_t or atv_b, utv_t or utv_b
     vtype = "Łączone" if atv and utv else "ATV" if atv else "UTV" if utv else "?"

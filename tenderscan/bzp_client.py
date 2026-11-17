@@ -36,7 +36,7 @@ PROVINCES = {
 
 
 class BzpClient:
-    def __init__(self, page_size: int = 500, pause_s: float = 1.0, timeout_s: int = 120, log=None):
+    def __init__(self, page_size: int = 500, pause_s: float = 0.5, timeout_s: int = 120, log=None):
         self.log = log
         self.page_size = page_size
         self.pause_s = pause_s
@@ -65,38 +65,47 @@ class BzpClient:
                 time.sleep(5 * (attempt + 1))
         return []
 
-    def fetch_window(self, notice_type: str, start: datetime, end: datetime,
-                     order_type: str | None = "Delivery") -> Iterator[dict]:
-        params = {
-            "NoticeType": notice_type,
-            "PublicationDateFrom": start.strftime("%Y-%m-%dT%H:%M:%S"),
-            "PublicationDateTo": end.strftime("%Y-%m-%dT%H:%M:%S"),
-            "PageSize": self.page_size,
-        }
-        if order_type:
-            params["OrderType"] = order_type
-        items = self._get(params)
-        time.sleep(self.pause_s)
-        if len(items) >= self.page_size and (end - start) > timedelta(minutes=10):
-            mid = start + (end - start) / 2
-            yield from self.fetch_window(notice_type, start, mid, order_type)
-            yield from self.fetch_window(notice_type, mid + timedelta(seconds=1), end, order_type)
-        else:
-            yield from items
-
     def fetch_range(self, notice_type: str, date_from: datetime, date_to: datetime,
-                    order_type: str | None = "Delivery") -> Iterator[dict]:
-        """Pobiera dzień po dniu (htmlBody jest duży)."""
-        day = date_from.replace(hour=0, minute=0, second=0, microsecond=0)
-        while day <= date_to:
-            end = min(day + timedelta(days=1) - timedelta(seconds=1), date_to)
-            n = 0
-            for item in self.fetch_window(notice_type, day, end, order_type):
+                    order_type: str | None = None) -> Iterator[dict]:
+        """Pobiera wszystkie ogłoszenia z zakresu dat.
+
+        Zachowanie API (sprawdzone 17.11.2026): PublicationDateFrom działa jako dolna granica,
+        PublicationDateTo jest ignorowane, wynik jest posortowany rosnąco po dacie publikacji
+        i ucięty do PageSize (max 500). Kolejne strony: SearchAfter=<objectId ostatniego rekordu>.
+        OrderType również jest ignorowany – filtrujemy po stronie klienta.
+        """
+        to_iso = date_to.strftime("%Y-%m-%dT%H:%M:%S")
+        after, n, pages = None, 0, 0
+        while True:
+            params = {"NoticeType": notice_type,
+                      "PublicationDateFrom": date_from.strftime("%Y-%m-%dT%H:%M:%S"),
+                      "PageSize": self.page_size}
+            if after:
+                params["SearchAfter"] = after
+            items = self._get(params)
+            pages += 1
+            time.sleep(self.pause_s)
+            if not items:
+                break
+            stop = False
+            for it in items:
+                if (it.get("publicationDate") or "")[:19] > to_iso:
+                    stop = True
+                    break
+                if order_type and it.get("orderType") not in (None, order_type):
+                    continue
                 n += 1
-                yield item
-            if self.log:
-                self.log(f"  {notice_type} {day:%Y-%m-%d}: {n} ogłoszeń")
-            day += timedelta(days=1)
+                yield it
+            if self.log and pages % 4 == 0:
+                self.log(f"  {notice_type}: {n} ogłoszeń, doszedłem do {(items[-1].get('publicationDate') or '')[:16]}")
+            if stop or len(items) < self.page_size:
+                break
+            new_after = items[-1].get("objectId")
+            if not new_after or new_after == after:
+                break
+            after = new_after
+        if self.log:
+            self.log(f"  {notice_type}: razem {n} ogłoszeń ({pages} zapytań)")
 
 
 def notice_link(n: dict) -> str:

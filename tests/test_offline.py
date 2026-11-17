@@ -36,17 +36,33 @@ def test_bzp_record():
     assert r["matches"][0]["model"] == "Ranger XP 1000", r["matches"][0]
 
 
-def test_bisection():
+def test_paging():
+    """API: From = dolna granica, To ignorowane, max 500, kolejne strony przez SearchAfter."""
     c = bzp_client.BzpClient(page_size=2, pause_s=0)
+    data = [{"objectId": f"o{i}", "publicationDate": f"2026-11-01T0{i}:00:00Z"} for i in range(7)]
     calls = []
 
     def fake(params):
         calls.append(params)
-        return [{"n": 1}, {"n": 2}] if len(calls) == 1 else [{"n": len(calls)}]
+        start = 0
+        if "SearchAfter" in params:
+            start = [d["objectId"] for d in data].index(params["SearchAfter"]) + 1
+        return data[start:start + 2]
     with mock.patch.object(c, "_get", side_effect=fake):
-        out = list(c.fetch_window("ContractNotice", datetime(2026, 11, 1), datetime(2026, 11, 1, 23, 59)))
-    assert len(calls) == 3 and len(out) == 2
+        out = list(c.fetch_range("ContractNotice", datetime(2026, 11, 1), datetime(2026, 11, 1, 4, 30)))
+    assert [o["objectId"] for o in out] == ["o0", "o1", "o2", "o3", "o4"], out
+    assert len(calls) == 3
+
+
+def test_false_positives():
+    for t, body, cpv in [("Dostawa sprzętu rehabilitacyjnego", "Podpórka czterokołowa (rollator)", "33193120"),
+                         ("Zakup pojazdu użytkowego (segment LCV)", "", "34130000"),
+                         ("Lekki pojazd ratowniczo-gaśniczy", "", "34144200"),
+                         ("Zakup kosiarki wrzecionowej", "kosiarka samojezdna, czterokołowa", "16311100")]:
+        assert classify(t, cpv, body)["relevance"] < 50, t
+    assert classify("Dostawa pojazdu typu UTV i czterech pojazdów typu ATV", "34113300-5", "")["relevance"] == 100
+    assert classify("Zakup pojazdu terenowego", "34113300-5 (Pojazdy terenowe)", "")["relevance"] >= 50
 
 
 if __name__ == "__main__":
-    test_classify(); test_bzp_record(); test_bisection(); print("OK – wszystkie testy przeszły")
+    test_classify(); test_bzp_record(); test_paging(); test_false_positives(); print("OK – wszystkie testy przeszły")

@@ -60,6 +60,17 @@ def catalog() -> list[dict]:
     return json.loads(CATALOG_PATH.read_text(encoding="utf-8"))["models"]
 
 
+def migrate():
+    """v2: poprawione pobieranie (SearchAfter) i klasyfikacja – wyczyść wyniki z wersji 1."""
+    if meta("schema_ver") != "2":
+        con.execute("DELETE FROM tenders WHERE source='BZP'")
+        con.execute("DELETE FROM scans")
+        con.execute("DELETE FROM meta WHERE key IN ('last_scan_to','last_scan_ok')")
+        con.commit()
+        meta("schema_ver", "2")
+        log("Migracja v2: wyczyszczono wyniki skanów z poprzedniej wersji")
+
+
 def seed_history():
     """Pierwszy start: wczytaj historię z plików Projectsystem (seed/history.json)."""
     if meta("seeded"):
@@ -106,6 +117,7 @@ def run_scan(date_from: datetime, date_to: datetime, reason: str):
 
 
 def scheduler():
+    migrate()
     seed_history()
     while True:
         try:
