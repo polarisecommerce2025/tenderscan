@@ -8,7 +8,7 @@ import re
 ATV_RX = re.compile(
     r"(?<![A-Za-z])ATV(?![A-Za-z])|\bquad(?:a|y|em|ów|ami)?\b|czterokołowiec|pojazd\w* czterokołow\w*|\bL7e\b", re.I)
 UTV_RX = re.compile(
-    r"(?<![A-Za-z])UTV(?![A-Za-z])|\bSSV\b|side[\s-]?by[\s-]?side|\bRTV\b|pojazd\w* (?:typu )?ewakuacyjn\w* typu UTV", re.I)
+    r"(?<![A-Za-z])UTV(?![A-Za-z])|\bSSV\b|side[\s-]?by[\s-]?side|pojazd\w* (?:typu )?ewakuacyjn\w* typu UTV", re.I)
 GENERIC_RX = re.compile(
     r"pojazd\w* (?:typu )?(?:terenow|wielozadaniow|gąsienicow)\w*"
     r"|\bT3b\b|ciągnik\w* rolnicz\w* (?:typu|kategorii) T3", re.I)

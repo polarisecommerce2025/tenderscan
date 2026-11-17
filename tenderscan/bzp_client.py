@@ -79,6 +79,7 @@ class BzpClient:
         while True:
             params = {"NoticeType": notice_type,
                       "PublicationDateFrom": date_from.strftime("%Y-%m-%dT%H:%M:%S"),
+                      "PublicationDateTo": to_iso,   # wymagane przez API, choć nie ogranicza wyniku
                       "PageSize": self.page_size}
             if after:
                 params["SearchAfter"] = after

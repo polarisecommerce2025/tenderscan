@@ -85,6 +85,9 @@ def _contractors(n: dict) -> list[str]:
 def from_bzp(n: dict) -> dict:
     text = html_to_text(n.get("htmlBody"))
     kind = "result" if n.get("noticeType") == bzp.RESULT_NOTICE else "open"
+    pr = (n.get("procedureResult") or "")
+    if kind == "result" and "uniewa" in pr.lower():
+        kind = "cancelled"
     purl = platform_url(text)
     vals = extract_values(text) if kind == "result" else []
     wad = WADIUM_RX.search(text)
@@ -102,7 +105,8 @@ def from_bzp(n: dict) -> dict:
         "description": text[:30000],
         "winners": _contractors(n),
         "value": sum(vals) if vals else None, "budget": None,
-        "status": n.get("procedureResult") or ("Składanie ofert" if kind == "open" else "Rozstrzygnięte"),
+        "status": {"open": "Składanie ofert", "cancelled": "Unieważnione"}.get(kind, "Rozstrzygnięte")
+                  + (f" ({pr})" if pr and kind != "cancelled" else ""),
         "wadium": wad.group(1) if wad else None, "bzp_number": n.get("bzpNumber"),
     }
 
@@ -123,7 +127,7 @@ def save(con: sqlite3.Connection, r: dict) -> bool:
             for k in ("note", "watch", "result_link", "result_published"):  # dane użytkownika i wyniku zostają
                 if k in prev and k not in extra:
                     extra[k] = prev[k]
-            if old["kind"] == "result" and r.get("kind") == "open":  # nie cofaj rozstrzygniętego
+            if old["kind"] in ("result", "cancelled") and r.get("kind") == "open":  # nie cofaj rozstrzygniętego
                 r = {**r, "kind": "result", "status": old["status"], "value": old["value"],
                      "winners": json.loads(old["winners"] or "[]")}
         extra = json.dumps(extra, ensure_ascii=False, default=str)
@@ -150,8 +154,8 @@ def apply_result(con: sqlite3.Connection, res: dict) -> bool:
         extra = json.loads(row["extra"] or "{}")
         extra["result_link"] = res["link"]
         extra["result_published"] = res["published"]
-        con.execute("UPDATE tenders SET kind='result', status=?, winners=?, value=?, extra=?, updated=? WHERE id=?",
-                    (res["status"], json.dumps(res["winners"], ensure_ascii=False), res["value"],
+        con.execute("UPDATE tenders SET kind=?, status=?, winners=?, value=?, extra=?, updated=? WHERE id=?",
+                    (res["kind"], res["status"], json.dumps(res["winners"], ensure_ascii=False), res["value"],
                      json.dumps(extra, ensure_ascii=False), datetime.now().isoformat(timespec="seconds"),
                      row["id"]))
         con.commit()
@@ -181,7 +185,7 @@ def scan_bzp(con, catalog, date_from: datetime, date_to: datetime,
         for n in client.fetch_range(nt, date_from, date_to):
             seen += 1
             rec = analyse(from_bzp(n), catalog)
-            if rec["kind"] == "result" and apply_result(con, rec):
+            if rec["kind"] in ("result", "cancelled") and apply_result(con, rec):
                 stats["results_linked"] += 1
                 hit += 1
                 continue
