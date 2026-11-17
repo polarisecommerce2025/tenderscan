@@ -28,7 +28,7 @@ def test_classify():
 
 
 def test_bzp_record():
-    cat = load_catalog("data/catalog.json")
+    cat = load_catalog("seed/catalog.json")
     r = analyse(from_bzp(SAMPLE), cat)
     assert r["province"] == "Śląskie" and r["platform"] == "platformazakupowa.pl"
     params = {q["param"]: q for q in r["reqs"]["reqs"]}

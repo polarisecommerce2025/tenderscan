@@ -174,7 +174,7 @@ def rematch_all(con: sqlite3.Connection, catalog: list[dict]) -> int:
 
 def scan_bzp(con, catalog, date_from: datetime, date_to: datetime,
              min_relevance: int = 50, log=print, client: bzp.BzpClient | None = None) -> dict:
-    client = client or bzp.BzpClient()
+    client = client or bzp.BzpClient(log=log)
     stats = {"seen": 0, "hits": 0, "new": 0, "results_linked": 0, "new_items": []}
     for nt in (bzp.CONTRACT_NOTICE, bzp.RESULT_NOTICE):
         seen = hit = 0

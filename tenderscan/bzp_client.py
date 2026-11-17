@@ -36,7 +36,8 @@ PROVINCES = {
 
 
 class BzpClient:
-    def __init__(self, page_size: int = 500, pause_s: float = 1.0, timeout_s: int = 120):
+    def __init__(self, page_size: int = 500, pause_s: float = 1.0, timeout_s: int = 120, log=None):
+        self.log = log
         self.page_size = page_size
         self.pause_s = pause_s
         self.timeout_s = timeout_s
@@ -89,7 +90,12 @@ class BzpClient:
         day = date_from.replace(hour=0, minute=0, second=0, microsecond=0)
         while day <= date_to:
             end = min(day + timedelta(days=1) - timedelta(seconds=1), date_to)
-            yield from self.fetch_window(notice_type, day, end, order_type)
+            n = 0
+            for item in self.fetch_window(notice_type, day, end, order_type):
+                n += 1
+                yield item
+            if self.log:
+                self.log(f"  {notice_type} {day:%Y-%m-%d}: {n} ogłoszeń")
             day += timedelta(days=1)
 
 
